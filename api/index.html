@@ -1,0 +1,122 @@
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
+<script src="https://unpkg.com/mustache@latest"></script>
+
+<body hx-ext="client-side-templates">
+
+   <button hx-get="https://hn.algolia.com/api/v1/search?tags=front_page" hx-trigger="click" hx-target="#results"
+      hx-swap="innerHTML" hx-indicator=".loader" hx-disabled-elt="this" mustache-template="template-results">
+      Cargar resultados
+   </button>
+
+   <span class="htmx-indicator loader"></span>
+
+
+   <ul id="results">
+      <li> Haker News </li>
+   </ul>
+
+   <!-- Template muctache-->
+   <template id="template-results">
+      {{#hits}}
+      <li>
+         <a href="{{ url }}">{{title}}</a>
+      </li>
+      {{/hits}}
+      <!-- Infinite scroll -->
+      <li hx-get="https://hn.algolia.com/api/v1/search?tags=front_page&page=2&hitsPerPage=10" hx-trigger="revealed"
+         hx-swap="outerHTML" mustache-template="template-results">
+      </li>
+   </template>
+
+   <!-- Formulario de Movies -->
+   <form>
+      <input hx-post="http://127:3001/api/movies.json" hx-trigger="input changed delay:500ms"
+         hx-target="#results-movies" mustache-template="template-results-movies" hx-swap="innerHTML transition:true"
+         name="search" type="search" id="base-input" placeholder="Busca tu pelicula favorita">
+   </form>
+
+   <ul id="results-movies">
+   </ul>
+
+   <template id="template-results-movies">
+      {{#movies}}
+      <li>
+         <article>
+            <h1>{{title}}</h1>
+            <p>{{year}}</p>
+         </article>
+      </li>
+      {{/movies}}
+   </template>
+</body>
+
+<style>
+   body {
+      background-image: linear-gradient(#bfffb2, transparent);
+      list-style: none;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-size: 20px;
+   }
+
+   form {
+      width: 100%;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+   }
+
+   ul {
+      display: grid;
+      grid: column 2px;
+      gap: 10px;
+
+   }
+
+   li {
+      list-style: none;
+      margin-bottom: 4px;
+      max-width: 300px;
+      text-wrap: balance;
+   }
+
+   button {
+      margin: 10px;
+      font-size: large;
+      transition: opacity .3s;
+      padding: 10px 20px;
+      background-color: #07f1b7;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+   }
+
+   button:disabled {
+      opacity: .3;
+      pointer-events: none;
+      cursor: not-allowed;
+   }
+
+   .loader {
+      height: 10px;
+      width: 10px;
+      border: 1px solid black;
+      border-bottom: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      box-sizing: border-box;
+      animation: spin 1s linear infinite;
+   }
+
+   @keyframes spin {
+      0% {
+         transform: rotate(0deg);
+      }
+
+      100% {
+         transform: rotate(360deg);
+      }
+   }
+</style>
