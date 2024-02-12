@@ -1,43 +1,61 @@
 <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
 <script src="https://unpkg.com/mustache@latest"></script>
+<script> let buttons; </script>
 
 <body hx-ext="client-side-templates">
 
-   <button hx-get="https://hn.algolia.com/api/v1/search?tags=front_page" hx-trigger="click" hx-target="#results"
-      hx-swap="innerHTML" hx-indicator=".loader" hx-disabled-elt="this" mustache-template="template-results">
-      Cargar resultados
-   </button>
+   <div id="hakerank">
+      <h1>HakerRank</h1>
 
-   <span class="htmx-indicator loader"></span>
+      <button id="search_hr" hx-get="https://hn.algolia.com/api/v1/search?tags=front_page" hx-trigger="click"
+         hx-target="#results" hx-swap="innerHTML" hx-indicator=".loader" hx-disabled-elt="this"
+         mustache-template="template-results">
+         Cargar resultados
+         <span class="htmx-indicator loader"></span>
+      </button>
 
+      <ul id="results"></ul>
 
-   <ul id="results">
-      <li> Haker News </li>
-   </ul>
+      <!-- Template muctache-->
+      <template id="template-results">
+         <button class="stop">X</button>
+         <script>
+            buttons = document.querySelectorAll('.stop');
 
-   <!-- Template muctache-->
-   <template id="template-results">
-      {{#hits}}
-      <li>
-         <a href="{{ url }}">{{title}}</a>
-      </li>
-      {{/hits}}
-      <!-- Infinite scroll -->
-      <li hx-get="https://hn.algolia.com/api/v1/search?tags=front_page&page=2&hitsPerPage=10" hx-trigger="revealed"
-         hx-swap="outerHTML" mustache-template="template-results">
-      </li>
-   </template>
+            buttons.forEach(button => {
+               button.addEventListener('click', (event) => {
+                  event.preventDefault();
+                  document.getElementById('results').innerHTML = ""
+               })
+            })
+         </script>
+         {{#hits}}
+         <li>
+            <a href="{{ url }}">{{title}}</a>
+         </li>
+         {{/hits}}
+         <!-- Infinite scroll -->
+         <li hx-get="https://hn.algolia.com/api/v1/search?tags=front_page&page=2&hitsPerPage=10" hx-trigger="revealed"
+            hx-swap="outerHTML" mustache-template="template-results">
+         </li>
+      </template>
+   </div>
 
    <!-- Formulario de Movies -->
+   <h1 class="sm">Search the movie 🤖</h1>
+
    <form>
-      <input hx-post="http://127:3001/api/movies.json" hx-trigger="input changed delay:500ms"
+      <input hx-post="http://localhost:3000/api/movies" hx-trigger="input changed delay:500ms"
          hx-target="#results-movies" mustache-template="template-results-movies" hx-swap="innerHTML transition:true"
          name="search" type="search" id="base-input" placeholder="Busca tu pelicula favorita">
    </form>
 
-   <ul id="results-movies">
-   </ul>
+   <div class="data">
+      <ul id="results-movies">
+      </ul>
+
+   </div>
 
    <template id="template-results-movies">
       {{#movies}}
@@ -59,38 +77,80 @@
       font-size: 20px;
    }
 
+   #hakerank {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+   }
+
+   #results-movies {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      flex-wrap: wrap;
+   }
+
+   button {
+      cursor: pointer;
+   }
+
+   .stop {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 40px;
+      width: 50px;
+      margin-left: 300px;
+      margin-top: 20px;
+      border: 5px solid rgb(128, 52, 52);
+      background-color: rgb(218, 67, 67);
+      color: white;
+   }
+
+   .sm {
+      text-align: center;
+      margin-bottom: 25px;
+   }
+
    form {
       width: 100%;
-      margin: auto;
       display: flex;
       justify-content: center;
       align-items: center;
    }
 
-   ul {
-      display: grid;
-      grid: column 2px;
-      gap: 10px;
 
+   .data {
+      display: flex;
+      justify-content: center;
+      align-items: center;
    }
+
 
    li {
       list-style: none;
-      margin-bottom: 4px;
       max-width: 300px;
       text-wrap: balance;
+      display: flex;
+      justify-content: center;
+      align-items: center;
    }
 
    button {
-      margin: 10px;
+      margin-left: 5px;
       font-size: large;
       transition: opacity .3s;
-      padding: 10px 20px;
+      padding: 10px 10px 10px 25px;
       background-color: #07f1b7;
       color: black;
       font-weight: bold;
       border: none;
       border-radius: 5px;
+   }
+
+   span {
+      margin: 3px;
    }
 
    button:disabled {

@@ -8,8 +8,8 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "esModuleInterop": true,
-    "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
+    "skipDefaultLibCheck": true,
     "forceConsistentCasingInFileNames": true
   }
 }
